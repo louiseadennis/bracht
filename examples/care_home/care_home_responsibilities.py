@@ -16,7 +16,7 @@ class CleanSpill(Responsibility):
         self.addFailure(spill)
         self.addContinuation(CleanSpillFailContinuation())
         self.addContinuation(CleanSpillSuccessContinuation())
-        self.agents = ["cleaning agent"]
+        self.agents = ["cleaner1", "cleaner2"]
         
 class CleanSpillFailContinuation(Continuation):
     def __init__(self):

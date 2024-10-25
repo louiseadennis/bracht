@@ -9,11 +9,12 @@ from cleaning_agent import CleaningAgent
 class care_home_world(responsibility_world):
     def __init__(self):
         super().__init__()
-        simple_cleaning_agent = CleaningAgent(self)
+        simple_cleaning_agent_1 = CleaningAgent(self, "cleaner1")
+        simple_cleaning_agent_2 = CleaningAgent(self, "cleaner2")
         self.total_iterations = 5
         self.interactive = True
         self.spill_duration = 0
-        self.agents = [simple_cleaning_agent]
+        self.agents = [simple_cleaning_agent_1, simple_cleaning_agent_2]
            
     def update_perceptions(self):
         if self.iterations == 1:

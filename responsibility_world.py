@@ -3,6 +3,7 @@ from responsibility_agent import *
 class responsibility_world:
     def __init__(self):
         self.perceptions = []
+        self.agent_perceptions = {}
         self.messages = []
         self.iterations = 0
 
@@ -31,6 +32,10 @@ class responsibility_world:
             self.messages.append(task.message)
             
     def get_percepts(self, agent):
+        agent_perceptions = self.agent_perceptions.get(agent.name)
+        perceptions = self.agent_perceptions
+        if (agent_perceptions):
+            perceptions += agent_perceptions
         return self.perceptions
         
     def get_messages(self, agent):
