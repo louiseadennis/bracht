@@ -33,7 +33,7 @@ class care_home_world(responsibility_world):
             print("NOTIFIED")
             self.perceptions.append(FakeLogicObject("notified"))
         if (task.name == "clean"):
-            #self.remove_perception("spill")
+            self.remove_perception("spill")
             print("CLEANED")
             
     def remove_perception(self, string):

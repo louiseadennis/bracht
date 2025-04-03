@@ -1,0 +1,4 @@
+CURRENTLY Working on - IMPROVE OUTPUT SO CLEARER WHAT IS GOING ON!!!!
+
+care_home_world_simple_cleaning_fails.py - Two cleaning agents, spills don't get removed and agents notify of fact
+care_home_world_simple_cleaning_works.py - Two cleaning agents, spills get removed when cleaning takes place.
