@@ -19,13 +19,26 @@ class responsibility_world:
         stage = 0
         while stage < 5:
             actual_stage = stage % 5;
+            self.print_stage(actual_stage)
             for agent in self.agents:
                 agent.process_stage(actual_stage)
-                agent.print_agent()
+                agent.print_agent(actual_stage)
             
             if (self.interactive):
                 input("Next Stage?")
             stage = stage + 1
+    
+    def print_stage(self, stage):
+        if (stage == 0):
+            print("stage 1 - What are the Responsibilities?")
+        elif (stage == 1):
+            print("stage 2 - Assign Responsibilities")
+        elif (stage == 2):
+            print("stage 3 - Generate Tasks")
+        elif (stage == 3):
+            print("stage 4 - Do Tasks")
+        elif (stage == 4):
+            print("stage 5 - Get Input")
             
     def do(self, agent, task):
         if (task.name == "broadcast"):

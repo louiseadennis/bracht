@@ -30,11 +30,11 @@ class care_home_world(responsibility_world):
             
     def do(self, agent, task):
         if (task.name == "notify"):
-            print("NOTIFIED")
+            print(agent.name + " did NOTIFIED")
             self.perceptions.append(FakeLogicObject("notified"))
         if (task.name == "clean"):
             #self.remove_perception("spill")
-            print("CLEANED")
+            print(agent.name + " did CLEANED")
             
     def remove_perception(self, string):
         for p in self.perceptions:

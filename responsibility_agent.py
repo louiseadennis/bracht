@@ -20,7 +20,6 @@ class ResponsibilityAgent:
         # After Step 1 the responsibility model <B, R, A, C, H, T> becomes <B, R  \cup NR/OR, A, C, H, T>
         # Note: There may be responsibilities that never succeed or fail because they always hold - e.g., health and safety.
 
-            print("stage 1 - What are the Responsibilities?")
             new_r = []
             for r in self.responsibilities:
                 if (not r.succeed_or_fail(self.beliefs)):
@@ -62,7 +61,6 @@ class ResponsibilityAgent:
         # BT = \{broadcast(accept(self, r)) | r \in R \land self \in A_4(r) \}
         # After Step 2 the responsibility model <B, R, A, C, H, T> becomes <B, R, A_3, C, H, T \cup BT>
 
-            print("stage 2 - Assign Responsibilities")
             for r in self.responsibilities:
                 if (not r.assigned):
                     r.assigned = r.default_agents(self.beliefs)
@@ -85,18 +83,15 @@ class ResponsibilityAgent:
                         self.tasks.append(Broadcast(Accept(self.name, r.name)))
                         # Add to BT
         elif (stage == 2):
-            print("stage 3 - Generate Tasks")
             for r in self.responsibilities:
                 if self.name in r.assigned:
                     self.tasks = self.tasks + self.generate_tasks(r)
             self.tasks.append(Broadcast(State(self.responsibilities, self.dgc)))
         elif (stage == 3):
-            print("stage 4 - Do Tasks")
             for task in self.tasks:
                 self.world.do(self, task)
             self.tasks = []
         elif (stage == 4):
-            print("stage 5 - Get Input")
             percepts = self.world.get_percepts(self)
             messages = self.world.get_messages(self)
             
@@ -127,23 +122,41 @@ class ResponsibilityAgent:
     def addResponsibility(self, r):
          self.responsibilities.append(r)
                             
-    def print_agent(self):
-        print("Beliefs:")
-        self.beliefs.print()
-        print("Responsibilities:")
+    def print_agent(self, stage):
+        if (stage != 3):
+            print(self.name)
+        if (stage == 1 or stage == 4):
+            self.print_beliefs()
+        if (stage == 0 or stage == 4):
+            self.print_responsibilities()
+        if (stage == 1):
+            self.print_assignments()
+        # print("Capabilities:")
+        # for x in self.dgc.keys():
+        #    print(x + " :: " + str(self.dgc.get(x)))
+        # print("Hierarchy:")
+        # print(self.hierarchy)
+        if (stage == 1 or stage == 2):
+            self.print_tasks()
+       
+    def print_responsibilities(self):
+        print("   Responsibilities:")
         for r in self.responsibilities:
-            print(r.name)
-        print("Assignments:")
+            print("      " + r.name)
+            
+    def print_beliefs(self):
+        print("   Beliefs:")
+        self.beliefs.print("      ")
+        
+    def print_assignments(self):
+        print("   Assignments:")
         for r in self.responsibilities:
-            print(r.name + " :: " + str(r.assigned))
-        print("Capabilities:")
-        for x in self.dgc.keys():
-            print(x + " :: " + str(self.dgc.get(x)))
-        print("Hierarchy:")
-        print(self.hierarchy)
-        print("Tasks:")
+            print("      " + r.name + " :: " + str(r.assigned))
+            
+    def print_tasks(self):
+        print("   Tasks:")
         for t in self.tasks:
-            t.print()
+            t.print("      ")
             
 class Responsibility:
     def __init__(self, string):
@@ -278,11 +291,15 @@ class BeliefBase:
         else:
             self.beliefs.append(belief)
         
-    def print(self):
-        print(self.beliefs)
-        print(self.accepted)
-        print(self.not_accepted)
-        print(self.delegation)
+    def print(self, indent):
+        if (self.beliefs):
+            print(indent + str(self.beliefs))
+        if (self.accepted):
+            print(indent + "accepted responsiblities:" + self.accepted)
+        if (self.not_accepted):
+            print(indent + "rejected responsibilities:" + self.not_accepted)
+        if (self.delegation):
+            print(indent + "delegated responsibilities:" + self.delegation)
         
     def accept(self,r):
         if (r.name in self.accepted.keys()):
@@ -314,8 +331,8 @@ class FakeLogicObject:
         # We will use deadline in success conditions to mean - succeeded before and in fail conditions to mean continues after.
         self.deadline = None
         
-    def print(self):
-        print(self.name)
+    def print(self, indent):
+        print(indent + self.name)
         
     def __str__(self):
         return self.name
@@ -346,8 +363,8 @@ class Broadcast(FakeLogicObject):
         super().__init__("broadcast")
         self.message = m
         
-    def print(self):
-        print(self.name + "(" + self.message.toString() + ")")
+    def print(self, indent):
+        print(indent + self.name + "(" + self.message.toString() + ")")
 
 class Accept(FakeLogicObject):
     def __init__(self, ag, r):
