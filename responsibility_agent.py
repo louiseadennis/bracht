@@ -120,7 +120,7 @@ class ResponsibilityAgent:
                             self.responsibilites.append(r)
                             
     def addResponsibility(self, r):
-         self.responsibilities.append(r)
+        self.responsibilities.append(r)
                             
     def print_agent(self, stage):
         if (stage != 3):
@@ -177,6 +177,8 @@ class Responsibility:
             if (not beliefs.believes(b)):
                 success_outcome = False
                 break
+        if (len(self.success_conditions) == 0):
+            success_outcome = False
         if (success_outcome):
             return True
                 
@@ -185,6 +187,9 @@ class Responsibility:
             if (not beliefs.believes(b)):
                 fail_outcome =  False
                 break
+                
+        if (len(self.fail_conditions) == 0 ):
+            fail_outcome = False
                 
         
         return fail_outcome;
@@ -295,7 +300,8 @@ class BeliefBase:
         if (self.beliefs):
             print(indent + str(self.beliefs))
         if (self.accepted):
-            print(indent + "accepted responsiblities:" + self.accepted)
+            for r in self.accepted:
+                print(indent + r + " accepted by:" + str(self.accepted[r]))
         if (self.not_accepted):
             print(indent + "rejected responsibilities:" + self.not_accepted)
         if (self.delegation):

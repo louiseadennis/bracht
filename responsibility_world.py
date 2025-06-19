@@ -8,7 +8,7 @@ class responsibility_world:
         self.iterations = 0
 
     def run(self):
-        iterations = 0
+        self.iterations = 0
         while self.iterations < self.total_iterations:
             self.update_perceptions()
             self.messages = []
@@ -53,4 +53,12 @@ class responsibility_world:
         
     def get_messages(self, agent):
         return self.messages
+        
+    def update_perceptions(self):
+        return
+        
+    def remove_perception(self, string):
+        for p in self.perceptions:
+            if (p.name == string):
+                self.perceptions.remove(p)
 

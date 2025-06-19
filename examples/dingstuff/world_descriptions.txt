@@ -1,0 +1,1 @@
+dingstuff_world - a very simple world with one agent which has the responsibility to go ding if there is no stuff.  Once it has gone ding, there should be stuff.

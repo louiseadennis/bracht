@@ -35,11 +35,6 @@ class care_home_world(responsibility_world):
         if (task.name == "clean"):
             self.remove_perception("spill")
             print(agent.name + " did CLEANED")
-            
-    def remove_perception(self, string):
-        for p in self.perceptions:
-            if (p.name == string):
-                self.perceptions.remove(p)
                     
 world = care_home_world()
 world.run()
