@@ -40,7 +40,43 @@ class CleanSpillSuccessContinuation(Continuation):
         r = CleanSpill()
         return [r]
 
+# Name: notify,
+# Sub Responsibilities: {},
+# Success Condition?: none
+# Fail Condition: none
+# Conrinuation: {},
+# Default Agents: {}
 class NotifyHealthAndSafety(Responsibility):
     def __init__(self):
         super().__init__("notify")
         self.addSuccess(FakeLogicObject("notified"))
+
+# Name: keep_cleaning,
+# Sub Responsibilities: {},
+# Success Condition?: no spill
+# Fail Condition: none
+# Conrinuation: {},
+# Default Agents: {}
+
+
+# Name: health_and_safety,
+# Sub Responsibilities: [ensure_no_spills],
+# Success Condition: all sub-responsibilities sucessful
+# Fail Condition: a sub-responsibility fails
+# Continuation: {generate_report},
+# Default Agents: {health_and_safety_agent}
+
+
+# Name: ensure_no_spills,
+# Sub Responsibilities: [],
+# Success Condition: not_spill
+# Fail Condition: notify
+# Continuation: {ensure_continued_cleaning_attempts},
+# Default Agents: {}
+
+# Name: ensure_continued_cleaning_attmpts,
+# Sub Responsibilities: [],
+# Success Condition: not_spill
+# Fail Condition:
+# Continuation: {},
+# Default Agents: {}

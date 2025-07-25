@@ -1,4 +1,18 @@
-care_home_world_simple_cleaning_fails.py - Two cleaning agents, spills don't get removed and agents notify of fact
-care_home_world_simple_cleaning_works.py - Two cleaning agents, spills get removed when cleaning takes place.
+care_home_world_simple_cleaning_fails.py - Two cleaning agents, spills don't get removed and agents notify of fact, cleaning is default assignment of cleaning agents so they don't explicitly accept
+care_home_world_simple_cleaning_works.py - Two cleaning agents, spills get removed when cleaning takes place, cleaning is default assignment of cleaning agents so they don't explicitly accept
+care_home_world_mixed_locations.py - Two cleaning agents and two potential locaitons for spills.  The nearest agent moves towards and cleans the spill while the other agent - when generating tasks - reasons that it doesn't need to take action.
+care_home_world_dgc.py - Two cleaning agents and two potential locaitons for spills.  The nearest agent moves towards and cleans the spill while the other agent - when generating tasks - reasons that it doesn't need to take action.  However the nearest agent breaks down, and informs everyone it no longer has dgc and does not accept the assignment.  As a result the other agent cleans the spill.
 
-WORKING ONE
+
+DESIGNING WORLD WITH HIERARCHY
+
+1.  simple agents clean nearest spill by default
+2.  however healt and safety agent delegates task to further agent
+3.  as a result nearest agent doesn't bother (or further agent refuses and nearest agent does it anyway)
+4.  Will add some stuff about failing to clean in time but carrying on anyway
+
+DESIGNING MORE COMPLEX WORLD - SEARCH AND RESCUE
+
+1.  We have search robots, lifting robots, transport robots and a coordinator that is not always in range.
+2.  Design some kind of grid world with random - nothing, rubble, people, people and rubble in each location as well as range effects.
+

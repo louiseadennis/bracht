@@ -4,7 +4,7 @@ class ResponsibilityAgent:
         self.beliefs = BeliefBase()
         self.responsibilities = []
         self.hierarchy = {}
-        self.dgc = {}
+        self.dgc = {}  # responsibilities as keys, list of agents with dgc as values
         self.tasks = []
         self.world = env
         
@@ -63,8 +63,14 @@ class ResponsibilityAgent:
 
             for r in self.responsibilities:
                 if (not r.assigned):
-                    r.assigned = r.default_agents(self.beliefs)
+                    for a in r.default_agents(self.beliefs):
+                        if (a in self.dgc.get(r.name)):
+                            r.assigned.append(a)
                     # r is in A_1 above
+                for a in r.assigned:
+                    if (not a in self.dgc.get(r.name)):
+                        r.assigned.remove(a)
+                    
                 for a in self.beliefs.accept(r):
                     if (not a in r.assigned):
                         r.assigned.append(a)
@@ -74,7 +80,7 @@ class ResponsibilityAgent:
                 for a in self.beliefs.not_accept(r):
                     r.assigned.remove(a)
                 # for these three r was in A_2 above
-
+                
                 if (not r.assigned):
                     # r was in U
                     if (self.dgc.get(r.name) and self.name in self.dgc.get(r.name)):
@@ -86,7 +92,7 @@ class ResponsibilityAgent:
             for r in self.responsibilities:
                 if self.name in r.assigned:
                     self.tasks = self.tasks + self.generate_tasks(r)
-            self.tasks.append(Broadcast(State(self.responsibilities, self.dgc)))
+            self.tasks.append(Broadcast(State(self.name, self.responsibilities, self.dgc)))
         elif (stage == 3):
             for task in self.tasks:
                 self.world.do(self, task)
@@ -108,16 +114,35 @@ class ResponsibilityAgent:
                     self.beliefs.beliefs.remove(belief)
             
             for message in messages:
+                print(message.name)
                 if (message.name == "accept"):
                     self.beliefs.add(message)
+                    if (message.agent in self.beliefs.not_accepted[message.responsibility]):
+                        self.beliefs.not_accepted[message.responsibility].remove(message.agent)
                 if (message.name == "not_accept"):
                     self.beliefs.add(message)
+                    if (message.agent in self.beliefs.accepted[message.responsibility]):
+                        self.beliefs.accepted[message.responsibility].remove(message.agent)
                 if (message.name == "delegate"):
                     self.beliefs.add(message)
                 if (message.name == "state"):
                     for r in message.rs:
                         if not r in self.responsibilities:
-                            self.responsibilites.append(r)
+                            self.responsibilities.append(r)
+                    for c in message.cap:
+                        if (not message.agent in self.dgc.get(c)):
+                            self.dgc[c].append(message.agent)
+                    for c in self.dgc.keys():
+                        if (not message.agent in message.cap.get(c) and message.agent in self.dgc.get(c)):
+                            self.dgc.get(c).remove(message.agent)
+                        
+                                
+                            
+            self.update_dgc(percepts)
+            
+    # this needs to be overriden by agents - its an internal process
+    def update_dgc(self, percepts):
+        return
                             
     def addResponsibility(self, r):
         self.responsibilities.append(r)
@@ -131,6 +156,7 @@ class ResponsibilityAgent:
             self.print_responsibilities()
         if (stage == 1):
             self.print_assignments()
+            self.print_dgc()
         # print("Capabilities:")
         # for x in self.dgc.keys():
         #    print(x + " :: " + str(self.dgc.get(x)))
@@ -152,6 +178,11 @@ class ResponsibilityAgent:
         print("   Assignments:")
         for r in self.responsibilities:
             print("      " + r.name + " :: " + str(r.assigned))
+            
+    def print_dgc(self):
+        print("   DGC:")
+        for r in self.dgc.keys():
+            print("      " + r + " :: " + str(self.dgc.get(r)))
             
     def print_tasks(self):
         print("   Tasks:")
@@ -233,6 +264,9 @@ class Responsibility:
         for c in self.continuations:
             c.print()
         print("\nDefault Agents: ")
+        
+    def __eq__(self, other):
+        return self.name == other.name
                     
                     
         
@@ -395,8 +429,9 @@ class Delegate(FakeLogicObject):
         self.responsibility = r
         
 class State(FakeLogicObject):
-    def __init__(self, res, dgc):
+    def __init__(self, ag, res, dgc):
         super().__init__("state")
+        self.agent = ag
         self.rs = res
         self.cap = dgc
         
