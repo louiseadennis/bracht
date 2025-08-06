@@ -21,14 +21,16 @@ class ResponsibilityAgent:
         # Note: There may be responsibilities that never succeed or fail because they always hold - e.g., health and safety.
 
             new_r = []
-            for r in self.responsibilities:
+            for r in self.getHighLevelResponsibilities():
                 if (not r.succeed_or_fail(self.beliefs)):
                     new_r.append(r)
                     
                 # At this point new_r is OR from theory
-                    
-                for res in r.get_continuations(self.beliefs):
-                    new_r.append(res)
+                 
+                # Note this is a change from the theory in the word doc to avoid proliferation of responsibilities - this because health and safety has not clear success condition
+                if r.succeed_or_fail(self.beliefs):
+                    for res in r.get_continuations(self.beliefs):
+                        new_r.append(res)
                     
                 # new_r should now be NR
             self.responsibilities = new_r
@@ -61,23 +63,29 @@ class ResponsibilityAgent:
         # BT = \{broadcast(accept(self, r)) | r \in R \land self \in A_4(r) \}
         # After Step 2 the responsibility model <B, R, A, C, H, T> becomes <B, R, A_3, C, H, T \cup BT>
 
-            for r in self.responsibilities:
+            for r in self.getAllResponsibilities():
+                # print(self.name + " considering assigning " + r.name)
                 if (not r.assigned):
                     for a in r.default_agents(self.beliefs):
                         if (a in self.dgc.get(r.name)):
+                                                    # print(a + " gets it by default")
                             r.assigned.append(a)
                     # r is in A_1 above
                 for a in r.assigned:
                     if (not a in self.dgc.get(r.name)):
+                                                # print(a + " can't manage it")
                         r.assigned.remove(a)
                     
                 for a in self.beliefs.accept(r):
                     if (not a in r.assigned):
+                                                # print(a + " has accepted it")
                         r.assigned.append(a)
                 for a in self.beliefs.delegated_to(r):
                     if (not a in r.assigned):
+                                                # print(a + " has been delegated it")
                         r.assigned.append(a)
                 for a in self.beliefs.not_accept(r):
+                                            # print(a + " has refused it")
                     r.assigned.remove(a)
                 # for these three r was in A_2 above
                 
@@ -86,10 +94,12 @@ class ResponsibilityAgent:
                     if (self.dgc.get(r.name) and self.name in self.dgc.get(r.name)):
                         r.assigned.append(self.name)
                         # r is in A_3 above
+                                                # print(self.dgc.get(r.name))
+                                                # print("assigning to self")
                         self.tasks.append(Broadcast(Accept(self.name, r.name)))
                         # Add to BT
         elif (stage == 2):
-            for r in self.responsibilities:
+            for r in self.getAllResponsibilities():
                 if self.name in r.assigned:
                     self.tasks = self.tasks + self.generate_tasks(r)
             self.tasks.append(Broadcast(State(self.name, self.responsibilities, self.dgc)))
@@ -124,14 +134,20 @@ class ResponsibilityAgent:
                     if (message.agent in self.beliefs.accepted[message.responsibility]):
                         self.beliefs.accepted[message.responsibility].remove(message.agent)
                 if (message.name == "delegate"):
+                    print("adding delegation")
                     self.beliefs.add(message)
                 if (message.name == "state"):
                     for r in message.rs:
                         if not r in self.responsibilities:
                             self.responsibilities.append(r)
                     for c in message.cap:
-                        if (not message.agent in self.dgc.get(c)):
-                            self.dgc[c].append(message.agent)
+                        try:
+                            if (message.agent in message.cap.get(c) and not message.agent in self.dgc.get(c)):
+                                self.dgc[c].append(message.agent)
+                                print(self.name + " thinks " + message.agent + " can do " + c)
+                        except:
+                            if (message.agent in message.cap.get(c)):
+                                self.dgc[c] = [message.agent]
                     for c in self.dgc.keys():
                         if (not message.agent in message.cap.get(c) and message.agent in self.dgc.get(c)):
                             self.dgc.get(c).remove(message.agent)
@@ -146,6 +162,21 @@ class ResponsibilityAgent:
                             
     def addResponsibility(self, r):
         self.responsibilities.append(r)
+        
+    def getHighLevelResponsibilities(self):
+        responsibilities = []
+        for r in self.responsibilities:
+            responsibilities.append(r)
+        return responsibilities
+
+        
+    def getAllResponsibilities(self):
+        responsibilities = []
+        for r in self.responsibilities:
+            responsibilities.append(r)
+            for sr in r.getSubResponsibilities():
+                responsibilities.append(sr)
+        return responsibilities
                             
     def print_agent(self, stage):
         if (stage != 3):
@@ -168,7 +199,7 @@ class ResponsibilityAgent:
     def print_responsibilities(self):
         print("   Responsibilities:")
         for r in self.responsibilities:
-            print("      " + r.name)
+            r.print_concise("      ")
             
     def print_beliefs(self):
         print("   Beliefs:")
@@ -241,11 +272,38 @@ class Responsibility:
     def addSuccess(self, belief):
         self.success_conditions.append(belief)
         
+    def addAllSubSuccesses(self):
+        for r in self.sub_responsiblities:
+            for s in r.getAllSuccesses():
+                self.success_conditions.append(s)
+                
+    def getAllSuccesses(self):
+        return self.success_conditions
+        
+    def addAllSubFailures(self):
+        for r in self.sub_responsiblities:
+            for f in r.getAllFailures():
+                self.fail_conditions.append(f)
+                
+    def getAllFailures(self):
+        return self.fail_conditions
+        
+    def getSubResponsibilities(self):
+        responsibilities = []
+        for r in self.sub_responsiblities:
+            responsibilities.append(r)
+            for sr in r.getSubResponsibilities():
+                responsibilities.append(sr)
+        return responsibilities
+        
     def addFailure(self, belief):
         self.fail_conditions.append(belief)
 
     def addContinuation(self, continuation):
         self.continuations.append(continuation)
+        
+    def addResponsibility(self, responsibility):
+        self.sub_responsiblities.append(responsibility)
                     
     def print(self):
         print("Name: ")
@@ -264,6 +322,11 @@ class Responsibility:
         for c in self.continuations:
             c.print()
         print("\nDefault Agents: ")
+        
+    def print_concise(self, indent):
+        print(indent + self.name)
+        for r in self.sub_responsiblities:
+            r.print_concise(indent + " ")
         
     def __eq__(self, other):
         return self.name == other.name
@@ -339,7 +402,7 @@ class BeliefBase:
         if (self.not_accepted):
             print(indent + "rejected responsibilities:" + self.not_accepted)
         if (self.delegation):
-            print(indent + "delegated responsibilities:" + self.delegation)
+            print(indent + "delegated responsibilities:" + str(self.delegation))
         
     def accept(self,r):
         if (r.name in self.accepted.keys()):
@@ -427,6 +490,10 @@ class Delegate(FakeLogicObject):
         self.boss = ag1
         self.minion = ag2
         self.responsibility = r
+        
+    def toString(self):
+        return ("delegate(" + self.boss + " delegated " + self.responsibility + " to " + self.minion + ")")
+
         
 class State(FakeLogicObject):
     def __init__(self, ag, res, dgc):

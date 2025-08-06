@@ -65,6 +65,39 @@ class NotifyHealthAndSafety(Responsibility):
 # Fail Condition: a sub-responsibility fails
 # Continuation: {generate_report},
 # Default Agents: {health_and_safety_agent}
+class HealthAndSafety(Responsibility):
+    def __init__(self):
+        super().__init__("health_and_safety")
+        self.addResponsibility(EnsureNoSpills())
+        self.addContinuation(HealthandSafetyFailContinuation())
+        self.addContinuation(HealthandSafetySuccessContinuation())
+        self.addAllSubSuccesses()
+        self.addAllSubFailures()
+        self.agents = ["coordinator"]
+
+class HealthandSafetyFailContinuation(Continuation):
+    def __init__(self):
+        super().__init__()
+        spill = FakeLogicObject("notified")
+        self.addCondition(spill)
+        
+    def getContinuation(self):
+        print("generating report responsibility")
+        r = GenerateReport()
+        return [r]
+        
+class HealthandSafetySuccessContinuation(Continuation):
+    def __init__(self):
+        super().__init__()
+        
+    def getContinuation(self):
+        r = HealthAndSafety()
+        return [r]
+
+class GenerateReport(Responsibility):
+    def __init__(self):
+        super().__init__("generate_report")
+        self.addSuccess(FakeLogicObject("reported"))
 
 
 # Name: ensure_no_spills,
@@ -73,6 +106,26 @@ class NotifyHealthAndSafety(Responsibility):
 # Fail Condition: notify
 # Continuation: {ensure_continued_cleaning_attempts},
 # Default Agents: {}
+class EnsureNoSpills(Responsibility):
+    def __init__(self):
+        super().__init__("ensure_no_spills")
+        not_spill = FakeLogicObject("not_spill")
+        self.addSuccess(not_spill)
+        spill = FakeLogicObject("notified")
+        self.addFailure(spill)
+        self.addContinuation(ContinueCleaningAttemptsContinuation())
+        self.agents = ["coordinator"]
+        
+class ContinueCleaningAttemptsContinuation(Continuation):
+    def __init__(self):
+        super().__init__()
+        spill = FakeLogicObject("notified")
+        self.addCondition(spill)
+        
+    def getContinuation(self):
+        print("tell cleaners to keep trying")
+        r = EnsureContinueCleaning()
+        return [r]
 
 # Name: ensure_continued_cleaning_attmpts,
 # Sub Responsibilities: [],
@@ -80,3 +133,8 @@ class NotifyHealthAndSafety(Responsibility):
 # Fail Condition:
 # Continuation: {},
 # Default Agents: {}
+class EnsureContinueCleaning(Responsibility):
+    def __init__(self):
+        not_spill = FakeLogicObject("not_spill")
+        self.addSuccess(not_spill)
+

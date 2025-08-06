@@ -10,8 +10,8 @@ from health_and_safety_agent import HealthAndSafetyAgent
 class care_home_world(responsibility_world):
     def __init__(self):
         super().__init__()
-        simple_cleaning_agent_1 = CleaningAgent(self, "cleaner1")
-        simple_cleaning_agent_2 = CleaningAgent(self, "cleaner2")
+        simple_cleaning_agent_1 = CleaningAgent(self, "cleanerA")
+        simple_cleaning_agent_2 = CleaningAgent(self, "cleanerB")
         coordinator_agent = HealthAndSafetyAgent(self, "coordinator")
         self.total_iterations = 10
         self.interactive = True
@@ -35,64 +35,66 @@ class care_home_world(responsibility_world):
                 
         
     def update_locations(self):
-        self.remove_percept('at_stairs_cleaner_1')
-        self.remove_percept('at_stairs_cleaner_2')
-        self.remove_percept('near_stairs_cleaner_1')
-        self.remove_percept('near_stairs_cleaner_2')
-        self.remove_percept('middle_cleaner_1')
-        self.remove_percept('middle_cleaner_2')
-        self.remove_percept('at_hall_cleaner_1')
-        self.remove_percept('at_hall_cleaner_2')
-        self.remove_percept('near_hall_cleaner_1')
-        self.remove_percept('near_hall_cleaner_2')
+        self.remove_percept('at_stairs_cleaner_A')
+        self.remove_percept('at_stairs_cleaner_B')
+        self.remove_percept('near_stairs_cleaner_A')
+        self.remove_percept('near_stairs_cleaner_B')
+        self.remove_percept('middle_cleaner_A')
+        self.remove_percept('middle_cleaner_B')
+        self.remove_percept('at_hall_cleaner_A')
+        self.remove_percept('at_hall_cleaner_B')
+        self.remove_percept('near_hall_cleaner_A')
+        self.remove_percept('near_hall_cleaner_B')
         if (self.location_cleaner_1 == 0):
-            self.add_percept('at_stairs_cleaner_1')
+            self.add_percept('at_stairs_cleaner_A')
         elif (self.location_cleaner_1 == 1 or self.location_cleaner_1 == 2):
-            self.add_percept('near_stairs_cleaner_1')
+            self.add_percept('near_stairs_cleaner_B')
         elif (self.location_cleaner_1 == 3):
-            self.add_percept('middle_cleaner_1')
+            self.add_percept('middle_cleaner_A')
         elif (self.location_cleaner_1 == 4 or self.location_cleaner_1 == 5):
-            self.add_percept('near_hall_cleaner_1')
+            self.add_percept('near_hall_cleaner_A')
         else:
-            self.add_percept('at_hall_cleaner_1')
+            self.add_percept('at_hall_cleaner_A')
             
         if (self.location_cleaner_2 == 0):
-            self.add_percept('at_stairs_cleaner_2')
+            self.add_percept('at_stairs_cleaner_B')
         elif (self.location_cleaner_2 == 1 or self.location_cleaner_2 == 2):
-            self.add_percept('near_stairs_cleaner_2')
+            self.add_percept('near_stairs_cleaner_B')
         elif (self.location_cleaner_2 == 3):
-            self.add_percept('middle_cleaner_2')
+            self.add_percept('middle_cleaner_B')
         elif (self.location_cleaner_1 == 4 or self.location_cleaner_2 == 5):
-            self.add_percept('near_hall_cleaner_2')
+            self.add_percept('near_hall_cleaner_B')
         else:
-            self.add_percept('at_hall_cleaner_2')
+            self.add_percept('at_hall_cleaner_B')
 
     def do(self, agent, task):
         if (task.name == "notify"):
             print(agent.name + " did NOTIFIED")
             self.add_percept("notified")
         if (task.name == "clean"):
-            if (agent.name == "cleaner1" and self.location_cleaner_1 == 0):
+            if (agent.name == "cleanerA" and self.location_cleaner_1 == 0):
                 self.remove_perception("spill_stairs")
-            elif (agent.name == "cleaner1" and self.location_cleaner_1 == 4):
+            elif (agent.name == "cleanerA" and self.location_cleaner_1 == 4):
                 self.remove_perception("spill_hall")
-            elif (agent.name == "cleaner2" and self.location_cleaner_2 == 0):
+            elif (agent.name == "cleanerB" and self.location_cleaner_2 == 0):
                 self.remove_perception("spill_stairs")
-            elif (agent.name == "cleaner2" and self.location_cleaner_2 == 4):
+            elif (agent.name == "cleanerB" and self.location_cleaner_2 == 4):
                 self.remove_perception("spill_hall")
             print(agent.name + " did CLEANED")
         if (task.name == "move_hall"):
-            if (agent.name == "cleaner1"):
+            if (agent.name == "cleanerA"):
                 self.location_cleaner_1 = self.location_cleaner_1 + 1
             else:
                 self.location_cleaner_2 = self.location_cleaner_2 + 1
             print(agent.name + " moved towards hall")
         if (task.name == "move_stairs"):
-            if (agent.name == "cleaner1"):
+            if (agent.name == "cleanerA"):
                 self.location_cleaner_1 = self.location_cleaner_1 - 1
             else:
                 self.location_cleaner_2 = self.location_cleaner_2 - 1
             print(agent.name + " moved towards stairs")
+        else:
+            super().do(agent, task)
             
         self.update_locations()
                 

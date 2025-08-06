@@ -11,6 +11,8 @@ DESIGNING WORLD WITH HIERARCHY
 3.  as a result nearest agent doesn't bother (or further agent refuses and nearest agent does it anyway)
 4.  Will add some stuff about failing to clean in time but carrying on anyway
 
+TO DO: Check theory around success and failure of sub-responsibilities
+
 DESIGNING MORE COMPLEX WORLD - SEARCH AND RESCUE
 
 1.  We have search robots, lifting robots, transport robots and a coordinator that is not always in range.
