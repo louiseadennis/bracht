@@ -23,3 +23,6 @@ class HealthAndSafetyAgent(ResponsibilityAgent):
          if (self.beliefs.believes(FakeLogicObject(string))):
             return True
             
+    def want_to_accept(self, r_name):
+        return True
+            

@@ -131,7 +131,7 @@ class ResponsibilityAgent:
                         self.beliefs.not_accepted[message.responsibility].remove(message.agent)
                 if (message.name == "not_accept"):
                     self.beliefs.add(message)
-                    if (self.beliefs.not_accepted.get(message.responsibility) and message.agent in self.beliefs.accepted[message.responsibility]):
+                    if (self.beliefs.accepted.get(message.responsibility) and message.agent in self.beliefs.accepted[message.responsibility]):
                         self.beliefs.accepted[message.responsibility].remove(message.agent)
                 if (message.name == "delegate"):
                     print("adding delegation")

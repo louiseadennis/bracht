@@ -36,6 +36,9 @@ class CleaningAgent(ResponsibilityAgent):
          if (self.beliefs.believes(FakeLogicObject(string))):
             return True
             
+    def want_to_accept(self, r_name):
+        return True
+            
     def update_dgc(self, percepts):
         if (FakeLogicObject("broken_cleaner_1") in percepts and self.name == "cleaner1"):
             new_dgc = []
@@ -100,3 +103,11 @@ class CleaningAgent(ResponsibilityAgent):
                     return True
                 else:
                     return False
+                    
+# Grumpy Cleaning Agents don't accept responsibility for things unless forced upon them
+class GrumpyCleaningAgent(CleaningAgent):
+    def __init__(self, env, name):
+        super().__init__(env, name)
+        
+    def want_to_accept(self, r_name):
+        return False

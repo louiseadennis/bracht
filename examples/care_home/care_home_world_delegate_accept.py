@@ -3,15 +3,15 @@ sys.path.insert(0, '../..')
 
 from responsibility_world import *
 from responsibility_agent import FakeLogicObject
-from cleaning_agent import CleaningAgent
+from cleaning_agent import GrumpyCleaningAgent
 from health_and_safety_agent import HealthAndSafetyAgent
 
 
 class care_home_world(responsibility_world):
     def __init__(self):
         super().__init__()
-        simple_cleaning_agent_1 = CleaningAgent(self, "cleanerA")
-        simple_cleaning_agent_2 = CleaningAgent(self, "cleanerB")
+        simple_cleaning_agent_1 = GrumpyCleaningAgent(self, "cleanerA")
+        simple_cleaning_agent_2 = GrumpyCleaningAgent(self, "cleanerB")
         coordinator_agent = HealthAndSafetyAgent(self, "coordinator")
         self.total_iterations = 10
         self.interactive = True
