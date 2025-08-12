@@ -91,7 +91,7 @@ class ResponsibilityAgent:
                 
                 if (not r.assigned):
                     # r was in U
-                    if (self.dgc.get(r.name) and self.name in self.dgc.get(r.name)):
+                    if (self.dgc.get(r.name) and self.name in self.dgc.get(r.name) and self.want_to_accept(r.name)):
                         r.assigned.append(self.name)
                         # r is in A_3 above
                                                 # print(self.dgc.get(r.name))
@@ -127,11 +127,11 @@ class ResponsibilityAgent:
                 print(message.name)
                 if (message.name == "accept"):
                     self.beliefs.add(message)
-                    if (message.agent in self.beliefs.not_accepted[message.responsibility]):
+                    if (self.beliefs.not_accepted.get(message.responsibility) and message.agent in self.beliefs.not_accepted[message.responsibility]):
                         self.beliefs.not_accepted[message.responsibility].remove(message.agent)
                 if (message.name == "not_accept"):
                     self.beliefs.add(message)
-                    if (message.agent in self.beliefs.accepted[message.responsibility]):
+                    if (self.beliefs.not_accepted.get(message.responsibility) and message.agent in self.beliefs.accepted[message.responsibility]):
                         self.beliefs.accepted[message.responsibility].remove(message.agent)
                 if (message.name == "delegate"):
                     print("adding delegation")
@@ -177,7 +177,7 @@ class ResponsibilityAgent:
             for sr in r.getSubResponsibilities():
                 responsibilities.append(sr)
         return responsibilities
-                            
+                                    
     def print_agent(self, stage):
         if (stage != 3):
             print(self.name)

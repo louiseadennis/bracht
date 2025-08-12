@@ -12,6 +12,9 @@ class DingStuffAgent(ResponsibilityAgent):
             if not self.beliefs.believes(FakeLogicObject("stuff")):
                 self.tasks.append(FakeLogicObject("make_ding"))
         return tasks
+        
+    def want_to_accept(self, r):
+        return True
          
  
 class DingStuffResponsibility(Responsibility):
