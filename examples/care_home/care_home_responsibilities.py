@@ -7,17 +7,26 @@ from responsibility_agent import Responsibility, Continuation, FakeLogicObject
 # Conrinuation: {notify health and safety agent if failed},
 # Default Agents: {cleaning robots}
 
-class CleanSpill(Responsibility):
-    def __init__(self):
-        super().__init__("clean_spill")
+class CleanSpillBasic(Responsibility):
+    def __init__(self, name):
+        super().__init__(name)
         not_spill = FakeLogicObject("not_spill")
         self.addSuccess(not_spill)
         spill = FakeLogicObject("spill_10")
         self.addFailure(spill)
         self.addContinuation(CleanSpillFailContinuation())
+
+class CleanSpillNoDefault(CleanSpillBasic):
+    def __init__(self):
+        super().__init__("clean_spill_no_defaults")
+        self.addContinuation(CleanSpillNDSuccessContinuation())
+
+class CleanSpill(CleanSpillBasic):
+    def __init__(self):
+        super().__init__("clean_spill")
         self.addContinuation(CleanSpillSuccessContinuation())
         self.agents = ["cleaner1", "cleaner2"]
-        
+ 
 class CleanSpillFailContinuation(Continuation):
     def __init__(self):
         super().__init__()
@@ -39,6 +48,18 @@ class CleanSpillSuccessContinuation(Continuation):
         print("returning clean spill")
         r = CleanSpill()
         return [r]
+        
+class CleanSpillNDSuccessContinuation(Continuation):
+    def __init__(self):
+        super().__init__()
+        spill = FakeLogicObject("not_spill")
+        self.addCondition(spill)
+        
+    def getContinuation(self):
+        print("returning clean spill")
+        r = CleanSpillNoDefault()
+        return [r]
+
 
 # Name: notify,
 # Sub Responsibilities: {},

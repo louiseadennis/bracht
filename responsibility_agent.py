@@ -68,7 +68,7 @@ class ResponsibilityAgent:
                 if (not r.assigned):
                     for a in r.default_agents(self.beliefs):
                         if (a in self.dgc.get(r.name)):
-                                                    # print(a + " gets it by default")
+                            print(a + " gets " + r.name + " by default")
                             r.assigned.append(a)
                     # r is in A_1 above
                 for a in r.assigned:
@@ -81,8 +81,9 @@ class ResponsibilityAgent:
                                                 # print(a + " has accepted it")
                         r.assigned.append(a)
                 for a in self.beliefs.delegated_to(r):
+                    print(a + " in delegates for " + r.name)
                     if (not a in r.assigned):
-                                                # print(a + " has been delegated it")
+                        print(a + " has been delegated " + r.name)
                         r.assigned.append(a)
                 for a in self.beliefs.not_accept(r):
                                             # print(a + " has refused it")
@@ -124,7 +125,7 @@ class ResponsibilityAgent:
                     self.beliefs.beliefs.remove(belief)
             
             for message in messages:
-                print(message.name)
+                print("Message: " + message.name)
                 if (message.name == "accept"):
                     self.beliefs.add(message)
                     if (self.beliefs.not_accepted.get(message.responsibility) and message.agent in self.beliefs.not_accepted[message.responsibility]):
@@ -163,6 +164,11 @@ class ResponsibilityAgent:
     def addResponsibility(self, r):
         self.responsibilities.append(r)
         
+    def removeResponsibility(self, name):
+        for r in self.responsibilities:
+            if r.name == name:
+                self.responsibilities.remove(r)
+        
     def getHighLevelResponsibilities(self):
         responsibilities = []
         for r in self.responsibilities:
@@ -197,7 +203,7 @@ class ResponsibilityAgent:
             self.print_tasks()
        
     def print_responsibilities(self):
-        print("   Responsibilities:")
+        print("   Responsibilities in System:")
         for r in self.responsibilities:
             r.print_concise("      ")
             
@@ -416,6 +422,7 @@ class BeliefBase:
         else:
             return []
             
+    # something fishy here aiming for B |- delegate(r, a_1, a) \land (a_1, a) \in H)
     def delegated_to(self, r):
         if (r.name == self.delegation.keys()):
             minions = []

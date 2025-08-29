@@ -1,6 +1,7 @@
 from responsibility_agent import ResponsibilityAgent, FakeLogicObject
-from care_home_responsibilities import CleanSpill
+from care_home_responsibilities import CleanSpill, CleanSpillNoDefault
 
+# NB.  In some worlds the cleaners are cleaner1 and cleaner2 and some they are called cleanerA and cleanerB - at the moment this seems to work but is obviously messy.
 class CleaningAgent(ResponsibilityAgent):
     def __init__(self, env, name):
         super().__init__(name, env)
@@ -108,6 +109,10 @@ class CleaningAgent(ResponsibilityAgent):
 class GrumpyCleaningAgent(CleaningAgent):
     def __init__(self, env, name):
         super().__init__(env, name)
+        self.removeResponsibility("clean_spill")
+        print(self.responsibilities)
+        self.addResponsibility(CleanSpillNoDefault())
         
     def want_to_accept(self, r_name):
+        print(self.name + " won't accept " + r_name)
         return False
