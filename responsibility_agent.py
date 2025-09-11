@@ -80,7 +80,7 @@ class ResponsibilityAgent:
                     if (not a in r.assigned):
                                                 # print(a + " has accepted it")
                         r.assigned.append(a)
-                for a in self.beliefs.delegated_to(r):
+                for a in self.beliefs.delegated_to(r, self.hierarchy):
                     print(a + " in delegates for " + r.name)
                     if (not a in r.assigned):
                         print(a + " has been delegated " + r.name)
@@ -424,12 +424,13 @@ class BeliefBase:
             
     # something fishy here aiming for B |- delegate(r, a_1, a) \land (a_1, a) \in H)
     # let's not worry about minions inititally.
-    def delegated_to(self, r):
+    def delegated_to(self, r, hierarchy):
         if (r.name in self.delegation.keys()):
             print(self.delegation.get(r.name))
             minions = []
             for rel in self.delegation.get(r.name):
-                minions.append(rel[1])
+                if (rel[1] in hierarchy.get(rel[0])):
+                    minions.append(rel[1])
             return minions
         else:
             return []

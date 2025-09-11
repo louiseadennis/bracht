@@ -10,6 +10,7 @@ class HealthAndSafetyAgent(ResponsibilityAgent):
         self.dgc["health_and_safety"] = ["coordinator"]
         self.dgc["ensure_no_spills"] = ["coordinator"]
         self.dgc["generate_report"] = ["coordinator"]
+        self.hierarchy["coordinator"] = ["cleaner1","cleaner2"]
         self.delegated_1 = False
         for r in self.responsibilities:
             print("      " + r.name)

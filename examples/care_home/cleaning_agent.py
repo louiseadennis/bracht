@@ -8,6 +8,7 @@ class CleaningAgent(ResponsibilityAgent):
         self.addResponsibility(CleanSpill())
         self.dgc["clean_spill"] = ["cleaner1","cleaner2"]
         self.dgc["notify"] = ["cleaner1","cleaner2"]
+        self.hierarchy["coordinator"] = ["cleaner1","cleaner2"]
         
     def generate_tasks(self, r):
         tasks = []
