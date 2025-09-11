@@ -10,13 +10,15 @@ class HealthAndSafetyAgent(ResponsibilityAgent):
         self.dgc["health_and_safety"] = ["coordinator"]
         self.dgc["ensure_no_spills"] = ["coordinator"]
         self.dgc["generate_report"] = ["coordinator"]
+        self.delegated_1 = False
         for r in self.responsibilities:
             print("      " + r.name)
 
     def generate_tasks(self, r):
         tasks = []
-        if (r.name == "ensure_no_spills" and self.i_believe("spill_stairs")):
+        if (r.name == "ensure_no_spills" and self.i_believe("spill_stairs") and not self.delegated_1):
             self.tasks.append(Broadcast(Delegate("coordinator", "clean_spill_no_defaults", "cleaner1")))
+            self.delegated_1 = True
         return tasks
         
     def i_believe(self, string):
