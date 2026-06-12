@@ -6,7 +6,7 @@ class CleaningAgent(ResponsibilityAgent):
     def __init__(self, env, name):
         super().__init__(name, env)
         self.addResponsibility(CleanSpill())
-        self.dgc["clean_spill"] = ["cleaner1","cleaner2"]
+        self.dgc["clean_spill"] = ["cleaner1","cleaner2","cleaner_spare"]
         self.dgc["notify"] = ["cleaner1","cleaner2"]
         self.hierarchy["coordinator"] = ["cleaner1","cleaner2"]
         
@@ -41,6 +41,9 @@ class CleaningAgent(ResponsibilityAgent):
             
     def want_to_accept(self, r_name):
         return True
+        
+    def do_not_want_to_accept(self, r_name):
+        return False
             
     def update_dgc(self, percepts):
         if (FakeLogicObject("broken_cleaner_1") in percepts and self.name == "cleaner1"):
@@ -107,6 +110,14 @@ class CleaningAgent(ResponsibilityAgent):
                 else:
                     return False
                     
+# Happy Cleaning Agents are happy to accept responsibility
+class HappyCleaningAgent(CleaningAgent):
+    def __init__(self, env, name):
+        super().__init__(env, name)
+        self.removeResponsibility("clean_spill")
+        print(self.responsibilities)
+        self.addResponsibility(CleanSpillNoDefault())
+ 
 # Grumpy Cleaning Agents don't accept responsibility for things unless forced upon them
 class GrumpyCleaningAgent(CleaningAgent):
     def __init__(self, env, name):
@@ -118,3 +129,37 @@ class GrumpyCleaningAgent(CleaningAgent):
     def want_to_accept(self, r_name):
         print(self.name + " won't accept " + r_name)
         return False
+
+# Angry Cleaning Agents don't accept responsibility come what may
+class AngryCleaningAgent(CleaningAgent):
+    def __init__(self, env, name):
+        super().__init__(env, name)
+                #self.removeResponsibility("clean_spill")
+        print(self.responsibilities)
+        #self.addResponsibility(CleanSpillNoDefault())
+        
+    def want_to_accept(self, r_name):
+        print(self.name + " won't accept " + r_name)
+        return False
+
+    def do_not_want_to_accept(self, r_name):
+        print(self.name + " rejects " + r_name)
+        return True
+
+# Put Upon Cleaning Agents don't only accept responsibility if no one else has
+class PutUponCleaningAgent(CleaningAgent):
+    def __init__(self, env, name):
+        super().__init__(env, name)
+        self.removeResponsibility("clean_spill")
+        print(self.responsibilities)
+        self.addResponsibility(CleanSpillNoDefault())
+        self.unassigned_count_cleaning = 0
+        
+    def want_to_accept(self, r_name):
+        if self.unassigned_count_cleaning < 1:
+            print(self.name + " won't accept " + r_name)
+            self.unassigned_count_cleaning = self.unassigned_count_cleaning + 1
+            return False
+        else:
+            return True
+

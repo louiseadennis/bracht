@@ -17,8 +17,8 @@ class HealthAndSafetyAgent(ResponsibilityAgent):
 
     def generate_tasks(self, r):
         tasks = []
-        if (r.name == "ensure_no_spills" and self.i_believe("spill_stairs") and not self.delegated_1):
-            self.tasks.append(Broadcast(Delegate("coordinator", "clean_spill_no_defaults", "cleaner1")))
+        if (r.name == "clean_spill" and self.i_believe("spill_stairs") and not self.delegated_1):
+            self.tasks.append(Broadcast(Delegate("coordinator", "clean_spill", "cleaner1")))
             self.delegated_1 = True
         return tasks
         
@@ -28,4 +28,7 @@ class HealthAndSafetyAgent(ResponsibilityAgent):
             
     def want_to_accept(self, r_name):
         return True
+        
+    def do_not_want_to_accept(self, r_name):
+        return False
             

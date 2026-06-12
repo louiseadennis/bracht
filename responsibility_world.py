@@ -6,6 +6,7 @@ class responsibility_world:
         self.agent_perceptions = {}
         self.messages = []
         self.iterations = 0
+        self.agents = []
 
     def run(self):
         self.iterations = 0
@@ -30,7 +31,7 @@ class responsibility_world:
     
     def print_stage(self, stage):
         if (stage == 0):
-            print("stage 1 - What are the Responsibilities?")
+            print("stage 1 - What are the Agents and Responsibilities?")
         elif (stage == 1):
             print("stage 2 - Assign Responsibilities")
         elif (stage == 2):
@@ -61,4 +62,10 @@ class responsibility_world:
         for p in self.perceptions:
             if (p.name == string):
                 self.perceptions.remove(p)
+                
+    def agent_names(self):
+        agent_names = []
+        for a in self.agents:
+            agent_names.append(a.name)
+        return agent_names
 

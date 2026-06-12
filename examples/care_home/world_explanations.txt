@@ -2,9 +2,13 @@ care_home_world_simple_cleaning_fails.py - Two cleaning agents, spills don't get
 care_home_world_simple_cleaning_works.py - Two cleaning agents, spills get removed when cleaning takes place, cleaning is default assignment of cleaning agents so they don't explicitly accept
 care_home_world_mixed_locations.py - Two cleaning agents and two potential locaitons for spills.  The nearest agent moves towards and cleans the spill while the other agent - when generating tasks - reasons that it doesn't need to take action.
 care_home_world_dgc.py - Two cleaning agents and two potential locaitons for spills.  The nearest agent moves towards and cleans the spill while the other agent - when generating tasks - reasons that it doesn't need to take action.  However the nearest agent breaks down, and informs everyone it no longer has dgc and does not accept the assignment.  As a result the other agent cleans the spill.
+care_home_world_no_defaults.py - two cleaning agents, no default responsibilities.  Both accept responsibility for cleaning spills.
+care_home_world_reject.py - default agent rejects responsibility so "spare" agent accepts it.
+care_home_world_assymetric.py - no defaults, and neither agent accepts responsibility.  After one time step one agent does accept responsibility.
+care_home_world_delegate_accept.py - no default cleaning responsibility, but coordinator is responsible for health and safety.  It delegates cleaning responsibility to nearest agent when needed.
 
 
-DESIGNING WORLD WITH HIERARCHY
+OTHER IDEAS
 
 1.  simple agents clean nearest spill by default
 2.  however healt and safety agent delegates task to further agent

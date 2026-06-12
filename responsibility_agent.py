@@ -3,12 +3,13 @@ class ResponsibilityAgent:
         self.name = n
         self.beliefs = BeliefBase()
         self.responsibilities = []
-        self.hierarchy = {}
+        self.hierarchy = {} # agents as keys, delegees as values
         self.dgc = {}  # responsibilities as keys, list of agents with dgc as values
         self.tasks = []
         self.world = env
         
     def process_stage(self, stage):
+        print(f'{self.name} processing... ')
         if (stage == 0):
         # At the start of step one the agent state is <B, R, A, C, H, T>.
         # At this point in the cycle T should be the empty set.
@@ -34,6 +35,7 @@ class ResponsibilityAgent:
                     
                 # new_r should now be NR
             self.responsibilities = new_r
+            self.agents = self.world.agent_names()
         elif (stage == 1):
         
         # At the start of step two the agent state is <B, R, A, C, H, T>. T is the empty set.
@@ -64,16 +66,20 @@ class ResponsibilityAgent:
         # After Step 2 the responsibility model <B, R, A, C, H, T> becomes <B, R, A_3, C, H, T \cup BT>
 
             for r in self.getAllResponsibilities():
-                # print(self.name + " considering assigning " + r.name)
+                print(self.name + " considering assigning " + r.name)
                 if (not r.assigned):
                     for a in r.default_agents(self.beliefs):
-                        if (a in self.dgc.get(r.name)):
+                        print(a + " in default agents")
+                        #print(a in self.dgc.get(r.name))
+                                                #print(a in self.agents)
+                                                #print(self.agents)
+                        if (a in self.dgc.get(r.name) and a in self.agents):
                             print(a + " gets " + r.name + " by default")
                             r.assigned.append(a)
                     # r is in A_1 above
                 for a in r.assigned:
-                    if (self.dgc.get(r.name) and not a in self.dgc.get(r.name)):
-                                                # print(a + " can't manage it")
+                    if (a in self.agents and self.dgc.get(r.name) and not a in self.dgc.get(r.name)):
+                        print(a + " can't manage it")
                         r.assigned.remove(a)
                     
                 for a in self.beliefs.accept(r):
@@ -82,27 +88,75 @@ class ResponsibilityAgent:
                         r.assigned.append(a)
                 for a in self.beliefs.delegated_to(r, self.hierarchy):
                     print(a + " in delegates for " + r.name)
-                    if (not a in r.assigned):
+                    if (a in self.agents and not a in r.assigned):
                         print(a + " has been delegated " + r.name)
                         r.assigned.append(a)
                 for a in self.beliefs.not_accept(r):
                                             # print(a + " has refused it")
-                    r.assigned.remove(a)
+                    if a in r.assigned:
+                        r.assigned.remove(a)
                 # for these three r was in A_2 above
                 
                 if (not r.assigned):
+                    print(f'{r.name} not assigned')
                     # r was in U
-                    if (self.dgc.get(r.name) and self.name in self.dgc.get(r.name) and self.want_to_accept(r.name)):
-                        r.assigned.append(self.name)
-                        # r is in A_3 above
+                    if (self.dgc.get(r.name) and self.name in self.dgc.get(r.name)):
+                        print(f'{self.name} considering {r.name}')
+                        if self.want_to_accept(r.name):
+                            r.assigned.append(self.name)
+                            # r is in A_3 above
                                                 # print(self.dgc.get(r.name))
                                                 # print("assigning to self")
-                        self.tasks.append(Broadcast(Accept(self.name, r.name)))
-                        # Add to BT
+                            self.tasks.append(Broadcast(Accept(self.name, r.name)))
+                 
+                print(r.assigned)
+                if self.name in r.assigned and self.do_not_want_to_accept(r.name):
+                        print(f'{r.name} rejected')
+                        r.assigned.remove(self.name)
+                        self.tasks.append(Broadcast(Not_Accept(self.name, r.name)))
+                   
+                #Lastly - for convenience assign all sub-responsibilities
+                for a in r.assigned:
+                    print(f'{a}: checking for sub responsibilities')
+                    for rsub in r.getSubResponsibilities():
+                        if not a in rsub.assigned:
+                            rsub.assigned.append(a)
         elif (stage == 2):
             for r in self.getAllResponsibilities():
                 if self.name in r.assigned:
                     self.tasks = self.tasks + self.generate_tasks(r)
+                    for r in r.getSubResponsibilities():
+                        self.tasks = self.tasks + self.generate_tasks(r)
+            invalid_tasks = []
+            for t in self.tasks:
+                if t.name == "broadcast":
+                    if t.message.name == "delegate":
+                        delegator = t.message.boss
+                        delegee = t.message.minion
+                        responsibility = t.message.responsibility
+                        print(delegator)
+                        print(delegee)
+                        print(responsibility)
+                        if (not t.message.boss == self.name):
+                            invalid_tasks.append(t)
+                            continue
+                        elif (not r in self.getAllResponsibilities()):
+                            invalid_tasks.append(t)
+                            continue
+                        elif (not delegee in self.agents):
+                            invalid_tasks.append(t)
+                            continue
+                        elif (not delegee in self.hierarchy[self.name]):
+                            invalid_tasks.append(t)
+                            continue
+                        elif (not delegee in self.dgc[responsibility]):
+                            invalid_tasks.append(t)
+                            continue
+                        else:
+                            for r in self.getAllResponsibilities():
+                                if r.name == responsibility:
+                                    r.assigned.append(delegee)
+                        
             self.tasks.append(Broadcast(State(self.name, self.responsibilities, self.dgc)))
         elif (stage == 3):
             for task in self.tasks:
@@ -183,7 +237,7 @@ class ResponsibilityAgent:
             for sr in r.getSubResponsibilities():
                 responsibilities.append(sr)
         return responsibilities
-                                    
+        
     def print_agent(self, stage):
         if (stage != 3):
             print(self.name)
@@ -387,7 +441,7 @@ class BeliefBase:
             else:
                 self.accepted[belief.responsibility] = [belief.agent]
         elif (belief.name == "not_accept"):
-            if (belief.responsibility in self.not_accepted.keys()):
+            if (belief.responsibility in self.not_accepted.keys()) and belief.agent not in self.not_accepted[belief.responsibility]:
                 self.not_accepted[belief.responsibility].append(belief.agent)
             else:
                 self.not_accepted[belief.responsibility] = [belief.agent]
@@ -406,7 +460,8 @@ class BeliefBase:
             for r in self.accepted:
                 print(indent + r + " accepted by:" + str(self.accepted[r]))
         if (self.not_accepted):
-            print(indent + "rejected responsibilities:" + self.not_accepted)
+            for r in self.not_accepted:
+                print(indent + "rejected responsibilities:" + str(self.not_accepted[r]))
         if (self.delegation):
             print(indent + "delegated responsibilities:" + str(self.delegation))
         
@@ -493,6 +548,9 @@ class Not_Accept(FakeLogicObject):
         super().__init__("not_accept")
         self.agent = ag
         self.responsibility = r
+
+    def toString(self):
+        return ("not_accept(" + self.agent + ", " + self.responsibility + ")")
 
 class Delegate(FakeLogicObject):
     def __init__(self, ag1, r, ag2):

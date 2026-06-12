@@ -18,7 +18,7 @@ class CleanSpillBasic(Responsibility):
 
 class CleanSpillNoDefault(CleanSpillBasic):
     def __init__(self):
-        super().__init__("clean_spill_no_defaults")
+        super().__init__("clean_spill")
         self.addContinuation(CleanSpillNDSuccessContinuation())
 
 class CleanSpill(CleanSpillBasic):
@@ -89,7 +89,7 @@ class NotifyHealthAndSafety(Responsibility):
 class HealthAndSafety(Responsibility):
     def __init__(self):
         super().__init__("health_and_safety")
-        self.addResponsibility(EnsureNoSpills())
+        self.addResponsibility(CleanSpillNoDefault())
         self.addContinuation(HealthandSafetyFailContinuation())
         self.addContinuation(HealthandSafetySuccessContinuation())
         self.addAllSubSuccesses()
