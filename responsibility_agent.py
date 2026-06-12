@@ -72,7 +72,7 @@ class ResponsibilityAgent:
                             r.assigned.append(a)
                     # r is in A_1 above
                 for a in r.assigned:
-                    if (not a in self.dgc.get(r.name)):
+                    if (self.dgc.get(r.name) and not a in self.dgc.get(r.name)):
                                                 # print(a + " can't manage it")
                         r.assigned.remove(a)
                     
@@ -80,7 +80,7 @@ class ResponsibilityAgent:
                     if (not a in r.assigned):
                                                 # print(a + " has accepted it")
                         r.assigned.append(a)
-                for a in self.beliefs.delegated_to(r):
+                for a in self.beliefs.delegated_to(r, self.hierarchy):
                     print(a + " in delegates for " + r.name)
                     if (not a in r.assigned):
                         print(a + " has been delegated " + r.name)
@@ -423,11 +423,14 @@ class BeliefBase:
             return []
             
     # something fishy here aiming for B |- delegate(r, a_1, a) \land (a_1, a) \in H)
-    def delegated_to(self, r):
-        if (r.name == self.delegation.keys()):
+    # let's not worry about minions inititally.
+    def delegated_to(self, r, hierarchy):
+        if (r.name in self.delegation.keys()):
+            print(self.delegation.get(r.name))
             minions = []
             for rel in self.delegation.get(r.name):
-                minions.append(rel[1])
+                if (rel[1] in hierarchy.get(rel[0])):
+                    minions.append(rel[1])
             return minions
         else:
             return []
@@ -492,7 +495,7 @@ class Not_Accept(FakeLogicObject):
         self.responsibility = r
 
 class Delegate(FakeLogicObject):
-    def __init__(self, ag1, ag2, r):
+    def __init__(self, ag1, r, ag2):
         super().__init__("delegate")
         self.boss = ag1
         self.minion = ag2

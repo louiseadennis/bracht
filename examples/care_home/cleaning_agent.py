@@ -8,28 +8,30 @@ class CleaningAgent(ResponsibilityAgent):
         self.addResponsibility(CleanSpill())
         self.dgc["clean_spill"] = ["cleaner1","cleaner2"]
         self.dgc["notify"] = ["cleaner1","cleaner2"]
+        self.hierarchy["coordinator"] = ["cleaner1","cleaner2"]
         
     def generate_tasks(self, r):
         tasks = []
+        need_to_clean = (r.name == "clean_spill" or r.name == "clean_spill_no_defaults")
         if (r.name == "notify"):
             self.tasks.append(FakeLogicObject("notify"))
-        elif (r.name == "clean_spill" and self.i_believe("spill")):
+        elif (need_to_clean and self.i_believe("spill")):
             self.tasks.append(FakeLogicObject("clean"))
-        elif (r.name == "clean_spill" and self.i_believe("spill_stairs") and self.name == "cleaner1" and self.i_believe("at_stairs_cleaner_1")):
+        elif (need_to_clean and self.i_believe("spill_stairs") and self.name == "cleaner1" and self.i_believe("at_stairs_cleaner_1")):
             self.tasks.append(FakeLogicObject("clean"))
-        elif (r.name == "clean_spill" and self.i_believe("spill_stairs") and self.name == "cleaner1" and not "cleaner2" in r.assigned and not self.i_believe("broken_cleaner_1")):
+        elif (need_to_clean and self.i_believe("spill_stairs") and self.name == "cleaner1" and not "cleaner2" in r.assigned and not self.i_believe("broken_cleaner_1")):
             self.tasks.append(FakeLogicObject("move_stairs"))
-        elif (r.name == "clean_spill" and self.i_believe("spill_stairs") and self.name == "cleaner2" and self.i_believe("at_stairs_cleaner_2")):
+        elif (need_to_clean and self.i_believe("spill_stairs") and self.name == "cleaner2" and self.i_believe("at_stairs_cleaner_2")):
             self.tasks.append(FakeLogicObject("clean"))
-        elif (r.name == "clean_spill" and self.i_believe("spill_stairs") and self.name == "cleaner2" and not "cleaner1" in r.assigned):
+        elif (need_to_clean and self.i_believe("spill_stairs") and self.name == "cleaner2" and not "cleaner1" in r.assigned):
             self.tasks.append(FakeLogicObject("move_stairs"))
-        elif (r.name == "clean_spill" and self.i_believe("spill_hall") and self.name == "cleaner1" and self.i_believe("at_hall_cleaner_1")):
+        elif (need_to_clean and self.i_believe("spill_hall") and self.name == "cleaner1" and self.i_believe("at_hall_cleaner_1")):
             self.tasks.append(FakeLogicObject("clean"))
-        elif (r.name == "clean_spill" and self.i_believe("spill_hall") and self.name == "cleaner2" and self.i_believe("at_stairs_cleaner_2")):
+        elif (need_to_clean and self.i_believe("spill_hall") and self.name == "cleaner2" and self.i_believe("at_stairs_cleaner_2")):
             self.tasks.append(FakeLogicObject("clean"))
-        elif (r.name == "clean_spill" and self.i_believe("spill_stairs") and self.nearest_to("stairs")) and (self.name == "cleaner2" or not self.i_believe("broken_cleaner_1")):
+        elif (need_to_clean and self.i_believe("spill_stairs") and self.nearest_to("stairs")) and (self.name == "cleaner2" or not self.i_believe("broken_cleaner_1")):
             self.tasks.append(FakeLogicObject("move_stairs"))
-        elif (r.name == "clean_spill" and self.i_believe("spill_hall") and self.nearest_to("hall")):
+        elif (need_to_clean and self.i_believe("spill_hall") and self.nearest_to("hall")):
             self.tasks.append(FakeLogicObject("move_hall"))
         return tasks
         
