@@ -25,7 +25,7 @@ class ResponsibilityAgent:
                 if (not r.succeed_or_fail(self.beliefs)):
                     new_r.append(r)
                     
-                # At this point new_r is OR from theory
+                # At this point new_r is R/OR
                  
                 # Note this is a change from the theory in the word doc to avoid proliferation of responsibilities - this because health and safety has not clear success condition
                 if r.succeed_or_fail(self.beliefs):
