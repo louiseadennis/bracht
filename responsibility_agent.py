@@ -9,7 +9,7 @@ class ResponsibilityAgent:
         self.world = env
         
     def process_stage(self, stage):
-        print(f'{self.name} processing... ')
+        print(f'\n{self.name} processing... ')
         if (stage == 0):
         # At the start of step one the agent state is <B, R, A, C, H, T>.
         # At this point in the cycle T should be the empty set.
@@ -69,7 +69,7 @@ class ResponsibilityAgent:
                 print(self.name + " considering assigning " + r.name)
                 if (not r.assigned):
                     for a in r.default_agents(self.beliefs):
-                        print(a + " in default agents")
+                                                #print(a + " in default agents")
                         #print(a in self.dgc.get(r.name))
                                                 #print(a in self.agents)
                                                 #print(self.agents)
@@ -109,7 +109,7 @@ class ResponsibilityAgent:
                                                 # print("assigning to self")
                             self.tasks.append(Broadcast(Accept(self.name, r.name)))
                  
-                print(r.assigned)
+                #print(r.assigned)
                 if self.name in r.assigned and self.do_not_want_to_accept(r.name):
                         print(f'{r.name} rejected')
                         r.assigned.remove(self.name)
@@ -122,6 +122,7 @@ class ResponsibilityAgent:
                         if not a in rsub.assigned:
                             rsub.assigned.append(a)
         elif (stage == 2):
+            #print(self.getAllResponsibilities())
             for r in self.getAllResponsibilities():
                 if self.name in r.assigned:
                     self.tasks = self.tasks + self.generate_tasks(r)
