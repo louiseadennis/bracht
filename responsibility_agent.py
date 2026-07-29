@@ -1,3 +1,5 @@
+import copy
+
 class ResponsibilityAgent:
     def __init__(self, n, env):
         self.name = n
@@ -158,7 +160,7 @@ class ResponsibilityAgent:
                                 if r.name == responsibility:
                                     r.assigned.append(delegee)
                         
-            self.tasks.append(Broadcast(State(self.name, self.responsibilities, self.dgc)))
+            self.tasks.append(Broadcast(State(self.name, copy.deepcopy(self.responsibilities), copy.deepcopy(self.dgc))))
         elif (stage == 3):
             for task in self.tasks:
                 self.world.do(self, task)
@@ -207,6 +209,7 @@ class ResponsibilityAgent:
                     for c in self.dgc.keys():
                         if (not message.agent in message.cap.get(c) and message.agent in self.dgc.get(c)):
                             self.dgc.get(c).remove(message.agent)
+                            print(self.name + " thinks " + message.agent + " can't do " + c)
                         
                                 
                             
