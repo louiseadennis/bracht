@@ -207,7 +207,7 @@ class ResponsibilityAgent:
                             if (message.agent in message.cap.get(c)):
                                 self.dgc[c] = [message.agent]
                     for c in self.dgc.keys():
-                        if (not message.agent in message.cap.get(c) and message.agent in self.dgc.get(c)):
+                        if (message.agent in self.dgc.get(c) and not message.agent in message.cap.get(c)):
                             self.dgc.get(c).remove(message.agent)
                             print(self.name + " thinks " + message.agent + " can't do " + c)
                         
