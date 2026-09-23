@@ -11,16 +11,22 @@ class task_world_base(responsibility_world):
         super().__init__()
         self.interactive = True
         self.task_count = 0
-        self.prob = 1
+        #Note this means we always add a task - may want to drop that later
+        self.prob = 10
+        self.total_iterations = 10
         random.seed(42)
         green_task_agent = GreenTaskAgent(self, "green")
+        self.agents = [green_task_agent]
         
     def update_perceptions(self):
         n = random.randint(1, 10)
         if (n <= self.prob):
             n = random.randint(1, 4)
+            #forcing green tasks
+            n = 1
             if (n == 1):
-                self.add_percept('green_task_{self.task_count}')
+                self.add_percept(f'green_task_{self.task_count}')
+                print(f'Adding green task {self.task_count}')
             #if (n == 2):
             #    self.add_percept('red_task_{self.task_count}')
             #if (n == 3):
@@ -29,9 +35,9 @@ class task_world_base(responsibility_world):
             #    self.add_percept('yellow_task_{self.task_count}')
             self.task_count = self.task_count + 1
     
-    def do(self, agent, task):
+            # def do(self, agent, task):
         # TO DO: make these have durations but for now keep simple
-        self.remove_percept(task)
+               #  self.remove_percept(task)
     
     def add_percept(self, string):
         self.perceptions.append(FakeLogicObject(string))

@@ -12,8 +12,13 @@ class GreenTaskAgent(ResponsibilityAgent):
             self.tasks.append(FakeLogicObject(r.name))
         return tasks
         
+    def getHighLevelResponsibilities(self):
+        new_r = super().getHighLevelResponsibilities()
+        for b in self.beliefs.beliefs:
+            print(b)
+        return new_r
         
-    def is_green(r):
+    def is_green(self, r):
         if r.name.startswith("green_task"):
             return True
         else:
@@ -26,7 +31,7 @@ class GreenTaskAgent(ResponsibilityAgent):
         return False
         
     def update_dgc(self, percepts):
-        for (p in percepts):
+        for p in percepts:
             if p.name.startswith("green"):
                 if p.name in self.dgc:
                     print("do nothing")
@@ -34,4 +39,4 @@ class GreenTaskAgent(ResponsibilityAgent):
                     self.dgc[p.name] = self.name
     
         
-q
+
