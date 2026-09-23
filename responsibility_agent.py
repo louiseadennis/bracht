@@ -1,3 +1,5 @@
+import copy
+
 class ResponsibilityAgent:
     def __init__(self, n, env):
         self.name = n
@@ -9,7 +11,7 @@ class ResponsibilityAgent:
         self.world = env
         
     def process_stage(self, stage):
-        print(f'{self.name} processing... ')
+        print(f'\n{self.name} processing... ')
         if (stage == 0):
         # At the start of step one the agent state is <B, R, A, C, H, T>.
         # At this point in the cycle T should be the empty set.
@@ -69,7 +71,7 @@ class ResponsibilityAgent:
                 print(self.name + " considering assigning " + r.name)
                 if (not r.assigned):
                     for a in r.default_agents(self.beliefs):
-                        print(a + " in default agents")
+                                                #print(a + " in default agents")
                         #print(a in self.dgc.get(r.name))
                                                 #print(a in self.agents)
                                                 #print(self.agents)
@@ -109,7 +111,7 @@ class ResponsibilityAgent:
                                                 # print("assigning to self")
                             self.tasks.append(Broadcast(Accept(self.name, r.name)))
                  
-                print(r.assigned)
+                #print(r.assigned)
                 if self.name in r.assigned and self.do_not_want_to_accept(r.name):
                         print(f'{r.name} rejected')
                         r.assigned.remove(self.name)
@@ -122,6 +124,7 @@ class ResponsibilityAgent:
                         if not a in rsub.assigned:
                             rsub.assigned.append(a)
         elif (stage == 2):
+            #print(self.getAllResponsibilities())
             for r in self.getAllResponsibilities():
                 if self.name in r.assigned:
                     self.tasks = self.tasks + self.generate_tasks(r)
@@ -157,7 +160,7 @@ class ResponsibilityAgent:
                                 if r.name == responsibility:
                                     r.assigned.append(delegee)
                         
-            self.tasks.append(Broadcast(State(self.name, self.responsibilities, self.dgc)))
+            self.tasks.append(Broadcast(State(self.name, copy.deepcopy(self.responsibilities), copy.deepcopy(self.dgc))))
         elif (stage == 3):
             for task in self.tasks:
                 self.world.do(self, task)
@@ -204,8 +207,9 @@ class ResponsibilityAgent:
                             if (message.agent in message.cap.get(c)):
                                 self.dgc[c] = [message.agent]
                     for c in self.dgc.keys():
-                        if (not message.agent in message.cap.get(c) and message.agent in self.dgc.get(c)):
+                        if (message.agent in self.dgc.get(c) and not message.agent in message.cap.get(c)):
                             self.dgc.get(c).remove(message.agent)
+                            print(self.name + " thinks " + message.agent + " can't do " + c)
                         
                                 
                             

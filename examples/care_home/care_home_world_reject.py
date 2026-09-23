@@ -13,7 +13,7 @@ class care_home_world(responsibility_world):
         simple_cleaning_agent_1 = AngryCleaningAgent(self, "cleaner1")
         simple_cleaning_agent_2 = CleaningAgent(self, "cleaner_spare")
         #coordinator_agent = HealthAndSafetyAgent(self, "coordinator")
-        self.total_iterations = 10
+        self.total_iterations = 20
         self.interactive = True
         self.spill_duration = 0
         self.location_cleaner_1 = 2 # near hall

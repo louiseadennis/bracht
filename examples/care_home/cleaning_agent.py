@@ -11,6 +11,7 @@ class CleaningAgent(ResponsibilityAgent):
         self.hierarchy["coordinator"] = ["cleaner1","cleaner2"]
         
     def generate_tasks(self, r):
+        #print(f'{self.name} generating tasks')
         tasks = []
         need_to_clean = (r.name == "clean_spill" or r.name == "clean_spill_no_defaults")
         if (r.name == "notify"):
@@ -21,15 +22,15 @@ class CleaningAgent(ResponsibilityAgent):
             self.tasks.append(FakeLogicObject("clean"))
         elif (need_to_clean and self.i_believe("spill_stairs") and self.name == "cleaner1" and not "cleaner2" in r.assigned and not self.i_believe("broken_cleaner_1")):
             self.tasks.append(FakeLogicObject("move_stairs"))
-        elif (need_to_clean and self.i_believe("spill_stairs") and self.name == "cleaner2" and self.i_believe("at_stairs_cleaner_2")):
+        elif (need_to_clean and self.i_believe("spill_stairs") and (self.name == "cleaner2" or self.name == "cleaner_spare") and self.i_believe("at_stairs_cleaner_2")):
             self.tasks.append(FakeLogicObject("clean"))
-        elif (need_to_clean and self.i_believe("spill_stairs") and self.name == "cleaner2" and not "cleaner1" in r.assigned):
+        elif (need_to_clean and self.i_believe("spill_stairs") and (self.name == "cleaner2" or self.name == "cleaner_spare") and not "cleaner1" in r.assigned):
             self.tasks.append(FakeLogicObject("move_stairs"))
         elif (need_to_clean and self.i_believe("spill_hall") and self.name == "cleaner1" and self.i_believe("at_hall_cleaner_1")):
             self.tasks.append(FakeLogicObject("clean"))
-        elif (need_to_clean and self.i_believe("spill_hall") and self.name == "cleaner2" and self.i_believe("at_stairs_cleaner_2")):
+        elif (need_to_clean and self.i_believe("spill_hall") and (self.name == "cleaner2" or self.name == "cleaner_spare") and self.i_believe("at_stairs_cleaner_2")):
             self.tasks.append(FakeLogicObject("clean"))
-        elif (need_to_clean and self.i_believe("spill_stairs") and self.nearest_to("stairs")) and (self.name == "cleaner2" or not self.i_believe("broken_cleaner_1")):
+        elif (need_to_clean and self.i_believe("spill_stairs") and self.nearest_to("stairs")) and (self.name == "cleaner2" or self.name == "cleaner_spare" or not self.i_believe("broken_cleaner_1")):
             self.tasks.append(FakeLogicObject("move_stairs"))
         elif (need_to_clean and self.i_believe("spill_hall") and self.nearest_to("hall")):
             self.tasks.append(FakeLogicObject("move_hall"))
@@ -46,7 +47,9 @@ class CleaningAgent(ResponsibilityAgent):
         return False
             
     def update_dgc(self, percepts):
+        self.print_dgc()
         if (FakeLogicObject("broken_cleaner_1") in percepts and self.name == "cleaner1"):
+            print("UPDATING")
             new_dgc = []
             for c in self.dgc.get("clean_spill"):
                 if (c != "cleaner1"):
