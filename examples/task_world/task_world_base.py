@@ -45,5 +45,13 @@ class task_world_base(responsibility_world):
     def remove_percept(self, string):
         self.remove_perception(string)
         
+    def do(self, agent, task):
+        if task.name.startswith("green"):
+            print(agent.name + " did " + task.name)
+            self.remove_percept(task.name)
+            self.add_percept("done_" + task.name)
+        else:
+            super().do(agent, task)
+        
 world = task_world_base()
 world.run()

@@ -34,7 +34,13 @@ class ResponsibilityAgent:
                 # BUT I don't want just continuations for those who have succeeded or failed
                 # if r.succeed_or_fail(self.beliefs):
                 for res in r.get_continuations(self.beliefs):
-                    new_r.append(res)
+                    genuinely_new = True
+                    for old_r in self.getAllResponsibilities():
+                        if old_r.name == res.name:
+                            genuinely_new = False
+                            break
+                    if genuinely_new:
+                        new_r.append(res)
                     
                 # new_r should now be NR
             self.responsibilities = new_r
@@ -400,12 +406,13 @@ class Responsibility:
         
 class Continuation:
     def __init__(self):
+        # print("Initialising continuation")
         self.condition = []
          
     def addCondition(self, criteria):
         self.condition.append(criteria)
         
-    def getContinuation():
+    def getContinuation(self):
         return []
         
     def print(self):
@@ -514,7 +521,7 @@ class FakeLogicObject:
         return self.name
         
     def __eq__(self, other):
-        if self.name == other.name:
+        if self.name == other:
             return True
         
 class Not(FakeLogicObject):
