@@ -91,8 +91,9 @@ class HealthAndSafety(Responsibility):
         super().__init__("health_and_safety")
         self.addResponsibility(CleanSpillNoDefault())
         self.addContinuation(HealthandSafetyFailContinuation())
-        self.addContinuation(HealthandSafetySuccessContinuation())
-        self.addAllSubSuccesses()
+        # I don't think this is needed, if it hasn't suceeded it won't be removed....
+        # self.addContinuation(HealthandSafetySuccessContinuation())
+                # self.addAllSubSuccesses()
         self.addAllSubFailures()
         self.agents = ["coordinator"]
 

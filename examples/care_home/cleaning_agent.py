@@ -47,7 +47,7 @@ class CleaningAgent(ResponsibilityAgent):
         return False
             
     def update_dgc(self, percepts):
-        self.print_dgc()
+        #self.print_dgc()
         if (FakeLogicObject("broken_cleaner_1") in percepts and self.name == "cleaner1"):
             print("UPDATING")
             new_dgc = []

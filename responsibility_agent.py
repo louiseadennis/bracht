@@ -30,10 +30,11 @@ class ResponsibilityAgent:
                     
                 # At this point new_r is R/OR
                  
-                # Note this is a change from the theory in the word doc to avoid proliferation of responsibilities - this because health and safety has not clear success condition
-                if r.succeed_or_fail(self.beliefs):
-                    for res in r.get_continuations(self.beliefs):
-                        new_r.append(res)
+                # Note this is a change from the theory in the word doc to avoid proliferation of responsibilities - this because health and safety has no clear success condition
+                # BUT I don't want just continuations for those who have succeeded or failed
+                # if r.succeed_or_fail(self.beliefs):
+                for res in r.get_continuations(self.beliefs):
+                    new_r.append(res)
                     
                 # new_r should now be NR
             self.responsibilities = new_r
