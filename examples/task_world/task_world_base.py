@@ -17,13 +17,14 @@ class task_world_base(responsibility_world):
         random.seed(42)
         green_task_agent = GreenTaskAgent(self, "green")
         self.agents = [green_task_agent]
+        self.tasks = {}
         
     def update_perceptions(self):
         n = random.randint(1, 10)
         if (n <= self.prob):
             n = random.randint(1, 4)
             #forcing green tasks
-            n = 1
+                        #n = 1
             if (n == 1):
                 self.add_percept(f'green_task_{self.task_count}')
                 print(f'Adding green task {self.task_count}')
@@ -48,8 +49,15 @@ class task_world_base(responsibility_world):
     def do(self, agent, task):
         if task.name.startswith("green"):
             print(agent.name + " did " + task.name)
-            self.remove_percept(task.name)
-            self.add_percept("done_" + task.name)
+            if task.name in self.tasks:
+                self.tasks[task.name] += 1
+            else:
+                self.tasks[task.name] = 1
+            
+            if self.tasks[task.name] >= 5:
+                self.remove_percept(task.name)
+                self.add_percept("done_" + task.name)
+                del self.tasks[task.name]
         else:
             super().do(agent, task)
         
