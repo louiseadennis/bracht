@@ -7,6 +7,7 @@ class responsibility_world:
         self.messages = []
         self.iterations = 0
         self.agents = []
+        self.output_level = 5
 
     def run(self):
         self.iterations = 0
@@ -23,7 +24,7 @@ class responsibility_world:
             self.print_stage(actual_stage)
             for agent in self.agents:
                 agent.process_stage(actual_stage)
-                agent.print_agent(actual_stage)
+                agent.print_agent(actual_stage, self.output_level)
             
             if (self.interactive):
                 input("Next Stage?")

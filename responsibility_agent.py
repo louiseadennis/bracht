@@ -9,6 +9,7 @@ class ResponsibilityAgent:
         self.dgc = {}  # responsibilities as keys, list of agents with dgc as values
         self.tasks = []
         self.world = env
+        self.output_level = 5
         
     def process_stage(self, stage):
         print(f'\n{self.name} processing... ')
@@ -78,17 +79,15 @@ class ResponsibilityAgent:
                 print(self.name + " considering assigning " + r.name)
                 if (not r.assigned):
                     for a in r.default_agents(self.beliefs):
-                                                #print(a + " in default agents")
-                        #print(a in self.dgc.get(r.name))
-                                                #print(a in self.agents)
-                                                #print(self.agents)
                         if (a in self.dgc.get(r.name) and a in self.agents):
-                            print(a + " gets " + r.name + " by default")
+                            if (self.output_level > 4):
+                                print(a + " gets " + r.name + " by default")
                             r.assigned.append(a)
                     # r is in A_1 above
                 for a in r.assigned:
                     if (a in self.agents and self.dgc.get(r.name) and not a in self.dgc.get(r.name)):
-                        print(a + " can't manage it")
+                        if self.output_level > 4:
+                            print(a + " can't manage it")
                         r.assigned.remove(a)
                     
                 for a in self.beliefs.accept(r):
@@ -96,9 +95,11 @@ class ResponsibilityAgent:
                                                 # print(a + " has accepted it")
                         r.assigned.append(a)
                 for a in self.beliefs.delegated_to(r, self.hierarchy):
-                    print(a + " in delegates for " + r.name)
+                    if self.output_level > 4:
+                        print(a + " in delegates for " + r.name)
                     if (a in self.agents and not a in r.assigned):
-                        print(a + " has been delegated " + r.name)
+                        if self.output_level > 4:
+                            print(a + " has been delegated " + r.name)
                         r.assigned.append(a)
                 for a in self.beliefs.not_accept(r):
                                             # print(a + " has refused it")
@@ -110,7 +111,8 @@ class ResponsibilityAgent:
                     print(f'{r.name} not assigned')
                     # r was in U
                     if (self.dgc.get(r.name) and self.name in self.dgc.get(r.name)):
-                        print(f'{self.name} considering {r.name}')
+                        if self.output_level > 3:
+                            print(f'{self.name} considering {r.name}')
                         if self.want_to_accept(r.name):
                             r.assigned.append(self.name)
                             # r is in A_3 above
@@ -120,13 +122,15 @@ class ResponsibilityAgent:
                  
                 #print(r.assigned)
                 if self.name in r.assigned and self.do_not_want_to_accept(r.name):
-                        print(f'{r.name} rejected')
+                        if self.output_level > 3:
+                            print(f'{r.name} rejected')
                         r.assigned.remove(self.name)
                         self.tasks.append(Broadcast(Not_Accept(self.name, r.name)))
                    
                 #Lastly - for convenience assign all sub-responsibilities
                 for a in r.assigned:
-                    print(f'{a}: checking for sub responsibilities')
+                    if self.output_level > 4:
+                        print(f'{a}: checking for sub responsibilities')
                     for rsub in r.getSubResponsibilities():
                         if not a in rsub.assigned:
                             rsub.assigned.append(a)
@@ -144,9 +148,9 @@ class ResponsibilityAgent:
                         delegator = t.message.boss
                         delegee = t.message.minion
                         responsibility = t.message.responsibility
-                        print(delegator)
-                        print(delegee)
-                        print(responsibility)
+                        #print(delegator)
+                        #print(delegee)
+                        #print(responsibility)
                         if (not t.message.boss == self.name):
                             invalid_tasks.append(t)
                             continue
@@ -189,7 +193,7 @@ class ResponsibilityAgent:
                     self.beliefs.beliefs.remove(belief)
             
             for message in messages:
-                print("Message: " + message.name)
+                #print("Message: " + message.name)
                 if (message.name == "accept"):
                     self.beliefs.add(message)
                     if (self.beliefs.not_accepted.get(message.responsibility) and message.agent in self.beliefs.not_accepted[message.responsibility]):
@@ -199,7 +203,7 @@ class ResponsibilityAgent:
                     if (self.beliefs.accepted.get(message.responsibility) and message.agent in self.beliefs.accepted[message.responsibility]):
                         self.beliefs.accepted[message.responsibility].remove(message.agent)
                 if (message.name == "delegate"):
-                    print("adding delegation")
+                    #print("adding delegation")
                     self.beliefs.add(message)
                 if (message.name == "state"):
                     for r in message.rs:
@@ -209,14 +213,16 @@ class ResponsibilityAgent:
                         try:
                             if (message.agent in message.cap.get(c) and not message.agent in self.dgc.get(c)):
                                 self.dgc[c].append(message.agent)
-                                print(self.name + " thinks " + message.agent + " can do " + c)
+                                if self.output_level > 4:
+                                    print(self.name + " thinks " + message.agent + " can do " + c)
                         except:
                             if (message.agent in message.cap.get(c)):
                                 self.dgc[c] = [message.agent]
                     for c in self.dgc.keys():
                         if (message.agent in self.dgc.get(c) and not message.agent in message.cap.get(c)):
                             self.dgc.get(c).remove(message.agent)
-                            print(self.name + " thinks " + message.agent + " can't do " + c)
+                            if self.output_level > 4:
+                                print(self.name + " thinks " + message.agent + " can't do " + c)
                         
                                 
                             
@@ -249,7 +255,7 @@ class ResponsibilityAgent:
                 responsibilities.append(sr)
         return responsibilities
         
-    def print_agent(self, stage):
+    def print_agent(self, stage, output_level):
         if (stage != 3):
             print(self.name)
         if (stage == 1 or stage == 4):
@@ -501,6 +507,9 @@ class BeliefBase:
             return minions
         else:
             return []
+            
+    def setOutputLevel(self, level):
+        self.output_level = level
 
 class FakeLogicObject:
     def __init__(self, string):

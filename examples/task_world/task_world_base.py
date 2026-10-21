@@ -4,7 +4,7 @@ sys.path.insert(0, '../..')
 
 from responsibility_world import *
 from responsibility_agent import FakeLogicObject
-from green_task_agent import GreenTaskAgent
+from base_task_agent import TaskAgent
 
 class task_world_base(responsibility_world):
     def __init__(self):
@@ -12,29 +12,32 @@ class task_world_base(responsibility_world):
         self.interactive = True
         self.task_count = 0
         #Note this means we always add a task - may want to drop that later
-        self.prob = 10
+        self.green_prob = 1
+        self.red_prob = 2
+        self.blue_prob = 3
         self.total_iterations = 10
         random.seed(42)
-        green_task_agent = GreenTaskAgent(self, "green")
+        green_task_agent = TaskAgent(self, "green", "green")
         self.agents = [green_task_agent]
         self.tasks = {}
         
     def update_perceptions(self):
         n = random.randint(1, 10)
-        if (n <= self.prob):
-            n = random.randint(1, 4)
-            #forcing green tasks
-                        #n = 1
-            if (n == 1):
-                self.add_percept(f'green_task_{self.task_count}')
-                print(f'Adding green task {self.task_count}')
-            #if (n == 2):
-            #    self.add_percept('red_task_{self.task_count}')
-            #if (n == 3):
-            #    self.add_percept('blue_task_{self.task_count}')
-            #if (n == 4):
-            #    self.add_percept('yellow_task_{self.task_count}')
+        if (n <= self.green_prob):
+            self.add_percept(f'green_task_{self.task_count}')
+            print(f'Adding green task {self.task_count}')
             self.task_count = self.task_count + 1
+        n = random.randint(1, 10)
+        if (n <= self.red_prob):
+            self.add_percept(f'red_task_{self.task_count}')
+            print(f'Adding red task {self.task_count}')
+            self.task_count = self.task_count + 1
+        n = random.randint(1, 10)
+        if (n <= self.blue_prob):
+            self.add_percept(f'blue_task_{self.task_count}')
+            print(f'Adding blue task {self.task_count}')
+            self.task_count = self.task_count + 1
+
     
             # def do(self, agent, task):
         # TO DO: make these have durations but for now keep simple
@@ -47,7 +50,7 @@ class task_world_base(responsibility_world):
         self.remove_perception(string)
         
     def do(self, agent, task):
-        if task.name.startswith("green"):
+        if task.name.startswith(agent.getColour()):
             print(agent.name + " did " + task.name)
             if task.name in self.tasks:
                 self.tasks[task.name] += 1
