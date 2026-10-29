@@ -33,7 +33,7 @@ class TaskContinuation(Continuation):
         #self.addCondition(there is a green task)
         
     def getTaskContinuation(self, b, colour):
-        print("generating new reponsibilty")
+                #print("generating new reponsibilty")
         r = SpecificTask(b.name, colour)
         return [r]
 

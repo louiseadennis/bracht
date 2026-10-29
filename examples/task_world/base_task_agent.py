@@ -22,7 +22,7 @@ class TaskAgent(ResponsibilityAgent):
     def getHighLevelResponsibilities(self):
         new_r = super().getHighLevelResponsibilities()
         for b in self.beliefs.beliefs:
-            print(b)
+            self.print_level(b)
         return new_r
             
     def want_to_accept(self, r_name):
@@ -36,7 +36,7 @@ class TaskAgent(ResponsibilityAgent):
             if p.name.startswith(self.colour):
                 if p.name in self.dgc:
                     if self.name in self.dgc[p.name]:
-                        print("do nothing")
+                        self.print_level("do nothing", 4)
                     else:
                         self.dgc[p.name].add(self.name)
                 else:

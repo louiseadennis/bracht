@@ -16,6 +16,7 @@ class responsibility_world:
             self.messages = []
             self.cycle_agents()
             self.iterations = self.iterations + 1;
+        self.on_end()
             
     def cycle_agents(self):
         stage = 0
@@ -29,18 +30,30 @@ class responsibility_world:
             if (self.interactive):
                 input("Next Stage?")
             stage = stage + 1
+            
+    def print_level(self, string, output_level=None):
+        if output_level is not None:
+            if self.output_level > output_level:
+                print(string)
+        else:
+            if self.output_level > 0:
+                print(string)
+
+            
+    def on_end(self):
+        print("Completed " + str(self.iterations) + " iterations.")
     
     def print_stage(self, stage):
         if (stage == 0):
-            print("stage 1 - What are the Agents and Responsibilities?")
+            self.print_level("stage 1 - What are the Agents and Responsibilities?")
         elif (stage == 1):
-            print("stage 2 - Assign Responsibilities")
+            self.print_level("stage 2 - Assign Responsibilities")
         elif (stage == 2):
-            print("stage 3 - Generate Tasks")
+            self.print_level("stage 3 - Generate Tasks")
         elif (stage == 3):
-            print("stage 4 - Do Tasks")
+            self.print_level("stage 4 - Do Tasks")
         elif (stage == 4):
-            print("stage 5 - Get Input")
+            self.print_level("stage 5 - Get Input")
             
     def do(self, agent, task):
         if (task.name == "broadcast"):
