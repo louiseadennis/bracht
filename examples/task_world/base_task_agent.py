@@ -13,9 +13,12 @@ class TaskAgent(ResponsibilityAgent):
         tasks = []
         if self.current_colour_tasks and self.beliefs.believes(FakeLogicObject("done_" + self.current_colour_tasks[0])):
             self.current_colour_tasks = []
-        if isinstance(r, SpecificTask) and self.my_colour(r.getColour()) and not self.current_colour_tasks:
+        # don't think need to check colour - this will only generate tasks for responsibilities accepted
+        #if isinstance(r, SpecificTask) and self.my_colour(r.getColour()) and not self.current_colour_tasks:
+        #    self.current_colour_tasks = [r.name]
+         if isinstance(r, SpecificTask) and not self.current_colour_tasks:
             self.current_colour_tasks = [r.name]
-        if self.current_colour_tasks and self.current_colour_tasks[0] == r.name:
+       if self.current_colour_tasks and self.current_colour_tasks[0] == r.name:
             tasks.append(FakeLogicObject(self.current_colour_tasks[0]))
         return tasks
 
