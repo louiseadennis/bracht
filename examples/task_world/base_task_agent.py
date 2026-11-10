@@ -53,6 +53,12 @@ class TaskAgent(ResponsibilityAgent):
             if string == colour:
                 return True
         return False
+        
+    def add_dgc(self, colour):
+        self.dgc[colour + "_tasks"] = [self.name]
+        
+    def add_colour(self, colour):
+        self.colours.append(colour)
 
         
 
